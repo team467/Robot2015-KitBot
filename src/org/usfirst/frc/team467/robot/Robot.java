@@ -24,6 +24,8 @@ public class Robot extends SampleRobot {
     RobotDrive myRobot;  // class that handles basic drive operations
     Joystick leftStick;  // set to ID 1 in DriverStation
     Joystick rightStick; // set to ID 2 in DriverStation
+    
+    //TRIVIAL CHANGE
     CameraServer cameraServer;
     public Robot() {
     	
