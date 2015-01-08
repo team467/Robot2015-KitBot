@@ -25,7 +25,7 @@ public class Robot extends SampleRobot {
     Joystick leftStick;  // set to ID 1 in DriverStation
     Joystick rightStick; // set to ID 2 in DriverStation
     
-    //TRIVIAL CHANGE
+    //TRIVIAL CHANGE num 2
     CameraServer cameraServer;
     public Robot() {
     	
