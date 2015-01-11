@@ -25,6 +25,10 @@ public class Robot extends SampleRobot {
     Joystick leftStick;  // set to ID 1 in DriverStation
     Joystick rightStick; // set to ID 2 in DriverStation
     
+    private final double LOW_PASS_FILTER_VALUE = 0.0;
+    private double angle;
+    Gyro2015 gyro;
+    
     //TRIVIAL CHANGE num 2
     CameraServer cameraServer;
     public Robot() {
@@ -33,7 +37,10 @@ public class Robot extends SampleRobot {
         myRobot.setExpiration(0.1);
         leftStick = new Joystick(0);
         rightStick = new Joystick(1);
-
+        
+        gyro = new Gyro2015(0);
+        angle = gyro.getAngle();
+        
         cameraServer = CameraServer.getInstance();
         cameraServer.setQuality(50);
         cameraServer.startAutomaticCapture("cam0");
@@ -45,6 +52,8 @@ public class Robot extends SampleRobot {
     public void operatorControl() {
         myRobot.setSafetyEnabled(true);
         while (isOperatorControl() && isEnabled()) {
+        	angle = gyro.getAngleHighPass(LOW_PASS_FILTER_VALUE);
+        	System.out.println("Angle: " + angle + " Rate: " + gyro.getUnfilteredRate());
         	myRobot.tankDrive(leftStick, rightStick);
             Timer.delay(0.005);		// wait for a motor update time
         }
