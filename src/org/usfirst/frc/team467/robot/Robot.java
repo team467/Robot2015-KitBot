@@ -24,11 +24,11 @@ public class Robot extends SampleRobot {
     RobotDrive myRobot;  // class that handles basic drive operations
     Joystick leftStick;  // set to ID 1 in DriverStation
     Joystick rightStick; // set to ID 2 in DriverStation
-    
-    private final double LOW_PASS_FILTER_VALUE = 0.0;
+
+    // Threshold in degrees / second
+    private final double HIGH_PASS_THRESHOLD = 0.5;
     Gyro2015 gyro;
     
-    //TRIVIAL CHANGE num 2
     CameraServer cameraServer;
     public Robot() {
     	
@@ -39,9 +39,9 @@ public class Robot extends SampleRobot {
         
         gyro = new Gyro2015(0);
         
-        cameraServer = CameraServer.getInstance();
-        cameraServer.setQuality(50);
-        cameraServer.startAutomaticCapture("cam0");
+//        cameraServer = CameraServer.getInstance();
+//        cameraServer.setQuality(50);
+//        cameraServer.startAutomaticCapture("cam0");
     }
     
     /**
@@ -50,10 +50,12 @@ public class Robot extends SampleRobot {
     public void operatorControl() {
         myRobot.setSafetyEnabled(true);
         while (isOperatorControl() && isEnabled()) {
-        	double angle = gyro.getAngleHighPass(LOW_PASS_FILTER_VALUE);
-        	System.out.println("Angle: " + angle + " Rate: " + gyro.getUnfilteredRate());
+        	gyro.updateAngleWithoutFilter(); // updateAngleHighPassFilter(HIGH_PASS_THRESHOLD)
+        	System.out.println(gyro);
         	myRobot.tankDrive(leftStick, rightStick);
-            Timer.delay(0.005);		// wait for a motor update time
+        	
+        	// wait for a motor update time
+        	Timer.delay(0.005);	
         }
     }
 }

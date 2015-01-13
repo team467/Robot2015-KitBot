@@ -2,9 +2,19 @@ package org.usfirst.frc.team467.robot;
 
 import edu.wpi.first.wpilibj.Gyro;
 
+/**
+ * @author nathan
+ *
+ */
 public class Gyro2015 {
-	private Gyro gyro;
-	private double trustedAngle;
+	private final Gyro gyro;
+	private double trustedAngle = 0.0;
+	private double currentAngle = 0.0;
+	private double prevAngle = 0.0;
+	private double deltaAngle = 0.0;
+	private long prevTime = 0;
+	private double deltaTime = 0.0;
+
 	/**
 	 * 2015 Analog Gyro with filtering.
 	 * @param port: Analog port gyro is connected to
@@ -12,58 +22,89 @@ public class Gyro2015 {
 	public Gyro2015(int port)
 	{
 		gyro = new Gyro(port);
-        gyro.startLiveWindowMode();
+        // gyro.startLiveWindowMode();
         
-        trustedAngle = gyro.getAngle();
+		//gyro.setSensitivity(voltsPerDegreePerSecond);
+		
+        prevTime = System.currentTimeMillis();
+        prevAngle = gyro.getAngle();
+	}
+	
+	private void update()
+	{
+		currentAngle = gyro.getAngle();
+		deltaAngle = currentAngle - prevAngle;
+		prevAngle = currentAngle;
+		
+		long now = System.currentTimeMillis();
+		deltaTime = now - prevTime;
+		prevTime = now;
+	}
+	
+	public double getAngle()
+	{
+		return trustedAngle;
 	}
 	
 	/**
 	 * Return gyro angle without filtering
 	 * @return angle
 	 */
-	public double getAngle(){
-		trustedAngle += gyro.getRate();
-		return trustedAngle;
+	public void updateAngleWithoutFilter()
+	{
+		update();
+		trustedAngle += deltaAngle;
 	}
 	/**
 	 * Return gyro angle with high pass filtering (Not inclusive)
 	 * @return angle
 	 */
-	public double getAngleHighPass(double filter){
-		if (gyro.getRate() > filter)
+	public void updateAngleHighPass(double filter)
+	{
+		update();
+		if (Math.abs(deltaAngle / deltaTime) > filter)
     	{
-			return getAngle();
+			trustedAngle += deltaAngle;
     	}
-		return trustedAngle;
 	}
 	/**
 	 * Return gyro angle with low pass filtering (Not inclusive)
 	 * @return angle
 	 */
-	public double getAngleLowPass(double filter){
-		if (gyro.getRate() < filter)
+	public void updateAngleLowPass(double filter)
+	{
+		update();
+		if (Math.abs(deltaAngle / deltaTime) < filter)
     	{
-			return getAngle();
+			trustedAngle += deltaAngle;
     	}
-		return trustedAngle;
 	}
 	/**
 	 * Return gyro angle with low and high pass filtering (Not inclusive)
 	 * @return angle
 	 */
-	public double getAngleLowAndHighPass(double low, double high){
-		if (gyro.getRate() > low && gyro.getRate() < high)
+	public void updateAngleLowAndHighPass(double low, double high)
+	{
+		update();
+		if (Math.abs(deltaAngle / deltaTime) > low && Math.abs(deltaAngle / deltaTime) < high)
     	{
-			return getAngle();
+			trustedAngle += deltaAngle;
     	}
-		return trustedAngle;
 	}
 	
+	
 	/**
-	 * Unfiltered rate from analog gyro.
-	 * @return Rate
+	 * @return deltaAngle / deltaTime
 	 */
-	public double getUnfilteredRate() {
-		return gyro.getRate();
+	public double getRatePerMillisecond()
+	{
+		return deltaAngle / deltaTime;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("Gyro2015 [trustedAngle=%6.2f, deltaAngle=%5.2f]", trustedAngle, deltaAngle);
+	}
+	
+	
 }
