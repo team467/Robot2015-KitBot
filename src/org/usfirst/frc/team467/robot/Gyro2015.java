@@ -103,7 +103,8 @@ public class Gyro2015 {
 
 	@Override
 	public String toString() {
-		return String.format("Gyro2015 [trustedAngle=%6.2f, deltaAngle=%5.2f]", trustedAngle, deltaAngle);
+		return String.format("Gyro2015 [trustedAngle=%-7.2f deg, deltaAngle=%-7.3f deg/sec]",
+				trustedAngle, deltaAngle / deltaTime);
 	}
 	
 	

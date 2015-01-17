@@ -1,9 +1,10 @@
 package org.usfirst.frc.team467.robot;
 
 import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.SampleRobot;
-import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
@@ -26,9 +27,9 @@ public class Robot extends SampleRobot {
     Joystick rightStick; // set to ID 2 in DriverStation
 
     // Threshold in degrees / second
-    private final double HIGH_PASS_THRESHOLD = 0.5;
+    private final double HIGH_PASS_THRESHOLD = 0.01;
     Gyro2015 gyro;
-    
+    PowerDistributionPanel panel;
     CameraServer cameraServer;
     public Robot() {
     	
@@ -50,8 +51,16 @@ public class Robot extends SampleRobot {
     public void operatorControl() {
         myRobot.setSafetyEnabled(true);
         while (isOperatorControl() && isEnabled()) {
-        	gyro.updateAngleWithoutFilter(); // updateAngleHighPassFilter(HIGH_PASS_THRESHOLD)
-        	System.out.println(gyro);
+        	gyro.updateAngleHighPass(HIGH_PASS_THRESHOLD); // updateAngleHighPassFilter(HIGH_PASS_THRESHOLD)
+        	//System.out.println(gyro);
+        	double frontLeft = panel.getCurrent(RobotMap.LEFT_CHANNEL);
+        	double frontRight = panel.getCurrent(RobotMap.RIGHT_CHANNEL);
+//        	double backLeft = panel.getCurrent(RobotMap.BACK_LEFT_CHANNEL);
+//        	double backRight = panel.getCurrent(RobotMap.BACK_RIGHT_CHANNEL);
+        	System.out.println("frontLeft=" + frontLeft +
+        					 ", frontRight=" + frontRight);
+//        	", backLeft=" + backLeft +
+//			 ", backRight=" + backRight
         	myRobot.tankDrive(leftStick, rightStick);
         	
         	// wait for a motor update time
